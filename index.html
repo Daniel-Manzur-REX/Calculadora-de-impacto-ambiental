@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impacto Ambiental del Arbolado Urbano</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 2em;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 1em;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .entry {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      margin-bottom: 1.5em;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 1em;
+    }
+    .entry label {
+      flex: 1 1 100%;
+      font-weight: bold;
+    }
+    select, input {
+      flex: 1 1 48%;
+      padding: 0.5em;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      padding: 0.75em 1.5em;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0.5em 0.5em 0.5em 0;
+    }
+    button:hover {
+      background: #27642a;
+    }
+    #exportable {
+      background: #f1f8e9;
+      padding: 2em;
+      border-radius: 10px;
+      border: 1px solid #c5e1a5;
+      margin-top: 2em;
+    }
+    .result ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .result li {
+      margin-bottom: 0.5em;
+    }
+    .proyecciones {
+      margin-top: 1em;
+      margin-bottom: 1em;
+      text-align: center;
+    }
+    #disclaimer {
+      margin-top: 2em;
+      font-size: 0.85em;
+      color: #777;
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+  <body>
+    <div class="container">
+      <h1>Calculadora de Impacto Ambiental - Arbolado Urbano en Nuevo León</h1>
+      <div id="especiesContainer"></div>
+      <button onclick="agregarEntrada()">Agregar Especie</button>
+      <button onclick="calcularImpactoProyecto()">Calcular Proyecto</button>
+      <div class="proyecciones">
+        <button onclick="mostrarProyeccion(1)">1 año</button>
+        <button onclick="mostrarProyeccion(5)">5 años</button>
+        <button onclick="mostrarProyeccion(10)">10 años</button>
+        <button onclick="exportarImagen()">Exportar Imagen</button>
+      </div>
+      
+      <div id="exportable">
+        <div class="result" id="resultado"></div>
+        <p id="disclaimer">
+          Toda la información presentada es un estimado considerando que los ejemplares adquieran las características plenas de su especie.
+        </p>
+      </div>
+    </div>
+    
+<script>
+  const datosEspecies = {
+    alamillo: { nombre: "Alamillo (<i>Populus tremuloides</i>)", co2: 35, o2: 150, temp: 2.5, agua: 1400 },
+    anacahuita: { nombre: "Anacahuita (<i>Cordia boissieri</i>)", co2: 18, o2: 120, temp: 1.5, agua: 1000 },
+    anacua: { nombre: "Anacua (<i>Ehretia anacua</i>)", co2: 28, o2: 135, temp: 2.4, agua: 1250 },
+    barreta: { nombre: "Barreta (<i>Helietta parvifolia</i>)", co2: 16, o2: 112, temp: 1.7, agua: 950 },
+    crespon: { nombre: "Crespón (<i>Lagerstroemia indica</i>)", co2: 24, o2: 128, temp: 1.9, agua: 1100 },
+    duraznillo: { nombre: "Duraznillo (<i>Quercus canbyi</i>)", co2: 40, o2: 160, temp: 2.5, agua: 1500 },
+    ebano: { nombre: "Ébano (<i>Ebenopsis ebano</i>)", co2: 22, o2: 130, temp: 2.0, agua: 1100 },
+    encino: { nombre: "Encino (<i>Quercus spp.</i>)", co2: 40, o2: 160, temp: 2.5, agua: 1500 },
+    encino_roble: { nombre: "Encino Roble (<i>Quercus polymorpha</i>)", co2: 42, o2: 165, temp: 2.6, agua: 1550 },
+    fresno: { nombre: "Fresno Plumero (<i>Fraxinus berlandieriana</i>)", co2: 25, o2: 145, temp: 2.2, agua: 1300 },
+    huizache: { nombre: "Huizache (<i>Acacia farnesiana</i>)", co2: 15, o2: 110, temp: 1.8, agua: 900 },
+    mimbre: { nombre: "Mimbre (<i>Chilopsis linearis</i>)", co2: 20, o2: 115, temp: 1.7, agua: 950 },
+    mezquite: { nombre: "Mezquite (<i>Prosopis glandulosa</i>)", co2: 30, o2: 140, temp: 2.3, agua: 1200 },
+    olmo: { nombre: "Olmo (<i>Ulmus crassifolia</i>)", co2: 30, o2: 140, temp: 2.3, agua: 1200 },
+    palo_blanco: { nombre: "Palo Blanco (<i>Celtis laevigata</i>)", co2: 28, o2: 135, temp: 2.4, agua: 1250 },
+    pino_piñonero: { nombre: "Pino Piñonero (<i>Pinus cembroides</i>)", co2: 25, o2: 100, temp: 2.0, agua: 1000 },
+    sicomoro: { nombre: "Sicomoro Mexicano (<i>Platanus occidentalis mexicana</i>)", co2: 38, o2: 170, temp: 2.8, agua: 1600 },
+    sabino: { nombre: "Sabino (<i>Taxodium mucronatum</i>)", co2: 45, o2: 175, temp: 3.0, agua: 1700 },
+    sauce: { nombre: "Sauce (<i>Salix nigra</i>)", co2: 35, o2: 150, temp: 2.5, agua: 1400 },
+    tronadora: { nombre: "Tronadora (<i>Tecoma stans</i>)", co2: 14, o2: 105, temp: 1.5, agua: 900 }
+  };
+  
+  let contador = 0;
+  let resultadosPorEspecie = [];
+  let total = { co2: 0, o2: 0, agua: 0 };
+  let aniosSeleccionados = 1;
+  function agregarEntrada() {
+    const contenedor = document.getElementById('especiesContainer');
+    const div = document.createElement('div');
+    div.className = 'entry';
+    const opciones = Object.keys(datosEspecies).sort().map(e => `<option value="${e}">${datosEspecies[e].nombre}</option>`).join('');
+    div.innerHTML = `
+    <label for="especie_${contador}">Especie:</label>
+    <select id="especie_${contador}">${opciones}</select>
+    <label for="cantidad_${contador}">Cantidad:</label>
+    <input type="number" id="cantidad_${contador}" placeholder="Ej. 10" min="1" />
+    `;
+    contenedor.appendChild(div);
+    contador++;
+  }
+  
+  function calcularImpactoProyecto() {
+    resultadosPorEspecie = [];
+    total = { co2: 0, o2: 0, agua: 0 };
+    for (let i = 0; i < contador; i++) {
+      const especieInput = document.getElementById(`especie_${i}`);
+      const cantidadInput = document.getElementById(`cantidad_${i}`);
+      if (!especieInput || !cantidadInput) continue;
+      
+      const especie = especieInput.value;
+      const cantidad = parseInt(cantidadInput.value);
+      if (!especie || isNaN(cantidad) || cantidad <= 0) continue;
+      
+      const datos = datosEspecies[especie];
+      
+      resultadosPorEspecie.push({
+        nombre: datos.nombre,
+        cantidad,
+        co2: datos.co2 * cantidad,
+        o2: datos.o2 * cantidad,
+        agua: datos.agua * cantidad,
+        temp: datos.temp
+      });
+      
+      total.co2 += datos.co2 * cantidad;
+      total.o2 += datos.o2 * cantidad;
+      total.agua += datos.agua * cantidad;
+    }
+    
+      mostrarProyeccion(1);
+    }
+
+    function mostrarProyeccion(anios) {
+      aniosSeleccionados = anios;
+      if (resultadosPorEspecie.length === 0) {
+        document.getElementById('resultado').innerHTML = '<strong>Primero calcula el proyecto.</strong>';
+        return;
+      }
+
+      let html = `<h2>Resultados por especie a ${anios} año(s)</h2><ul>`;
+      resultadosPorEspecie.forEach(r => {
+        html += `<li><strong>${r.nombre}:</strong> ${r.cantidad} árboles → CO₂: ${r.co2 * anios} kg, O₂: ${r.o2 * anios} kg, Agua: ${r.agua * anios} L, Reducción: ${r.temp} °C</li>`;
+      });
+      html += `</ul><h3>Total del proyecto a ${anios} año(s)</h3><ul>`;
+      html += `<li><strong>CO₂ total:</strong> ${(total.co2 * anios).toFixed(1)} kg</li>`;
+      html += `<li><strong>O₂ total:</strong> ${(total.o2 * anios).toFixed(1)} kg</li>`;
+      html += `<li><strong>Agua total interceptada:</strong> ${(total.agua * anios).toLocaleString()} L</li>`;
+      html += `</ul>`;
+
+      document.getElementById('resultado').innerHTML = html;
+    }
+
+    function exportarPDF() {
+      if (resultadosPorEspecie.length === 0) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(14);
+      doc.text("Impacto Ambiental del Arbolado Urbano", 15, 20);
+      doc.setFontSize(12);
+      doc.text(`Proyección a ${aniosSeleccionados} año(s)`, 15, 30);
+
+      let y = 40;
+      resultadosPorEspecie.forEach(r => {
+        doc.text(`- ${r.nombre.replace(/\*/g, '')}: ${r.cantidad} árboles`, 15, y);
+        y += 7;
+        doc.text(`  CO₂: ${r.co2 * aniosSeleccionados} kg, O₂: ${r.o2 * aniosSeleccionados} kg, Agua: ${r.agua * aniosSeleccionados} L, Reducción: ${r.temp} °C`, 20, y);
+        y += 10;
+        if (y > 270) { doc.addPage(); y = 20; }
+      });
+
+      doc.text("Totales del Proyecto:", 15, y);
+      y += 7;
+      doc.text(`CO₂ total: ${(total.co2 * aniosSeleccionados).toFixed(1)} kg`, 20, y); y += 7;
+      doc.text(`O₂ total: ${(total.o2 * aniosSeleccionados).toFixed(1)} kg`, 20, y); y += 7;
+      doc.text(`Agua interceptada: ${(total.agua * aniosSeleccionados).toLocaleString()} L`, 20, y);
+
+      doc.save("impacto_arbolado.pdf");
+    }
+
+function exportarImagen() {
+  const exportable = document.getElementById("exportable");
+  html2canvas(exportable).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "impacto_arbolado.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+    agregarEntrada();
+  </script>
+</body>
+</html>
