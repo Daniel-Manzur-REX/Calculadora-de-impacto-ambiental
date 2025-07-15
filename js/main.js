@@ -1,4 +1,4 @@
-const datosEspecies = {
+    const datosEspecies = {
       alamillo: { nombre: "Alamillo (<i>Populus tremuloides</i>)", co2: 35, o2: 150, temp: 2.5, agua: 1400 },
       anacahuita: { nombre: "Anacahuita (<i>Cordia boissieri</i>)", co2: 18, o2: 120, temp: 1.5, agua: 1000 },
       anacua: { nombre: "Anacua (<i>Ehretia anacua</i>)", co2: 28, o2: 135, temp: 2.4, agua: 1250 },
@@ -41,12 +41,14 @@ function agregarEntrada() {
   div.id = `entry_${contador}`;
   const opciones = Object.keys(datosEspecies).sort().map(e => `<option value="${e}">${datosEspecies[e].nombre}</option>`).join('');
   div.innerHTML = `
-    <label for="especie_${contador}">Especie:</label>
+    <div class="entry-row" style="margin-bottom:-0.4rem;">
+      <label for="especie_${contador}">Especie:</label>
+      <button type="button" class="btn btn-danger btn-sm eliminar-btn float-end" title="Eliminar esta especie" onclick="eliminarEntrada('entry_${contador}')">X</button>
+    </div>
     <select id="especie_${contador}">${opciones}</select>
     <label for="cantidad_${contador}">Cantidad:</label>
     <input type="number" id="cantidad_${contador}" placeholder="Ej. 10" min="1" />
-    <button type="button" class="btn btn-danger btn-sm ms-2 eliminar-btn" title="Eliminar esta especie" onclick="eliminarEntrada('entry_${contador}')">❌</button>
-  `;
+  `; 
   contenedor.appendChild(div);
   contador++;
 }
@@ -94,25 +96,28 @@ function calcularImpactoProyecto() {
   mostrarProyeccion(1);
 }
 
-    function mostrarProyeccion(anios) {
-      aniosSeleccionados = anios;
-      if (resultadosPorEspecie.length === 0) {
-        document.getElementById('resultado').innerHTML = '<strong>Primero calcula el proyecto.</strong>';
-        return;
-      }
+function mostrarProyeccion(anios) {
+  aniosSeleccionados = anios;
+  const exportable = document.getElementById('exportable');
+  if (resultadosPorEspecie.length === 0) {
+    document.getElementById('resultado').innerHTML = '<strong>Primero calcula el proyecto.</strong>';
+    exportable.style.display = 'none'; // Oculta el recuadro si no hay resultados
+    return;
+  }
 
-      let html = `<h2>Resultados por especie a ${anios} año(s)</h2><ul>`;
-      resultadosPorEspecie.forEach(r => {
-        html += `<li><strong>${r.nombre}:</strong> ${r.cantidad} árboles → CO₂: ${r.co2 * anios} kg, O₂: ${r.o2 * anios} kg, Agua: ${r.agua * anios} L, Reducción: ${r.temp} °C</li>`;
-      });
-      html += `</ul><h3>Total del proyecto a ${anios} año(s)</h3><ul>`;
-      html += `<li><strong>CO₂ total capturado:</strong> ${(total.co2 * anios).toFixed(1)} kg</li>`;
-      html += `<li><strong>O₂ total producido:</strong> ${(total.o2 * anios).toFixed(1)} kg</li>`;
-      html += `<li><strong>Agua total interceptada:</strong> ${(total.agua * anios).toLocaleString()} L</li>`;
-      html += `</ul>`;
+  let html = `<h2>Resultados por especie a ${anios} año(s)</h2><ul>`;
+  resultadosPorEspecie.forEach(r => {
+    html += `<li><strong>${r.nombre}:</strong> ${r.cantidad} árboles → CO₂: ${r.co2 * anios} kg, O₂: ${r.o2 * anios} kg, Agua: ${r.agua * anios} L, Reducción: ${r.temp} °C</li>`;
+  });
+  html += `</ul><h3>Total del proyecto a ${anios} año(s)</h3><ul>`;
+  html += `<li><strong>CO₂ total capturado:</strong> ${(total.co2 * anios).toFixed(1)} kg</li>`;
+  html += `<li><strong>O₂ total producido:</strong> ${(total.o2 * anios).toFixed(1)} kg</li>`;
+  html += `<li><strong>Agua total interceptada:</strong> ${(total.agua * anios).toLocaleString()} L</li>`;
+  html += `</ul>`;
 
-      document.getElementById('resultado').innerHTML = html;
-    }
+  document.getElementById('resultado').innerHTML = html;
+  exportable.style.display = 'block'; // Muestra el recuadro cuando hay resultados
+}
 
 function exportarImagen() {
   const exportable = document.getElementById("exportable");
