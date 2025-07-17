@@ -7,15 +7,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-  
 <body>
   <div class="container">   
     <img src="assets/creamos-futuro.png" alt="Logo REX" class="d-block mx-auto" style="max-width: 250px; margin-bottom: 1rem;">
-    <h1>Calculadora de Impacto Ambiental - Arbolado Urbano en Nuevo León</h1>
+    <h1 class="oswald-titulo">Calculadora de Impacto Ambiental - Arbolado Urbano en Nuevo León</h1>
     <div id="especiesContainer"></div>
     <div class="text-center mb-3">   
     <button onclick="agregarEntrada()">Agregar Especie</button>
@@ -29,7 +28,7 @@
       <button onclick="exportarImagen()">Exportar Imagen</button>
     </div>
 
-    <div id="exportable">
+    <div id="exportable" style="display: none;">
       <div class="result" id="resultado"></div>
       <p id="disclaimer">
         Toda la información presentada es un estimado considerando que los ejemplares adquieran las características plenas de su especie.
@@ -40,7 +39,7 @@
   <footer class="footer">
     <small>&copy; 2025 Reforestación Extrema - Todos los derechos reservados</small>
   </footer>
-  
-  <script src="js/main.js"></script>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
