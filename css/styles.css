@@ -142,3 +142,15 @@ footer {
   background-color: #f8fbff;
   box-sizing: border-box;
 }
+
+.tabla-resultados {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.tabla-resultados th:nth-child(1), .tabla-resultados td:nth-child(1) { width: 32%; }
+.tabla-resultados th:nth-child(2), .tabla-resultados td:nth-child(2) { width: 16%; text-align: center; }
+.tabla-resultados th:nth-child(3), .tabla-resultados td:nth-child(3) { width: 12%; text-align: center; }
+.tabla-resultados th:nth-child(4), .tabla-resultados td:nth-child(4) { width: 12%; text-align: center; }
+.tabla-resultados th:nth-child(5), .tabla-resultados td:nth-child(5) { width: 12%; text-align: center; }
+.tabla-resultados th:nth-child(6), .tabla-resultados td:nth-child(6) { width: 16%; text-align: center; }
