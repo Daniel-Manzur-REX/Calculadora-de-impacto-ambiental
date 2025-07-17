@@ -101,22 +101,44 @@ function mostrarProyeccion(anios) {
   const exportable = document.getElementById('exportable');
   if (resultadosPorEspecie.length === 0) {
     document.getElementById('resultado').innerHTML = '<strong>Primero calcula el proyecto.</strong>';
-    exportable.style.display = 'none'; // Oculta el recuadro si no hay resultados
+    exportable.style.display = 'none';
     return;
   }
 
-  let html = `<h2>Resultados por especie a ${anios} año(s)</h2><ul>`;
+  let html = `<h2>Resultados por especie a ${anios} año(s)</h2>`;
+  html += `<table class="table table-bordered table-striped tabla-resultados">
+    <thead>
+      <tr>
+        <th>Especie</th>
+        <th>Cantidad</th>
+        <th>CO₂ (kg)</th>
+        <th>O₂ (kg)</th>
+        <th>Agua (L)</th>
+        <th>Reducción (°C)</th>
+      </tr>
+    </thead>
+    <tbody>`;
   resultadosPorEspecie.forEach(r => {
-    html += `<li><strong>${r.nombre}:</strong> ${r.cantidad} árboles → CO₂: ${r.co2 * anios} kg, O₂: ${r.o2 * anios} kg, Agua: ${r.agua * anios} L, Reducción: ${r.temp} °C</li>`;
+    html += `<tr>
+      <td>${r.nombre}</td>
+      <td>${r.cantidad}</td>
+      <td>${(r.co2 * anios).toFixed(1)}</td>
+      <td>${(r.o2 * anios).toFixed(1)}</td>
+      <td>${(r.agua * anios).toLocaleString()}</td>
+      <td>${r.temp}</td>
+    </tr>`;
   });
-  html += `</ul><h3>Total del proyecto a ${anios} año(s)</h3><ul>`;
-  html += `<li><strong>CO₂ total capturado:</strong> ${(total.co2 * anios).toFixed(1)} kg</li>`;
-  html += `<li><strong>O₂ total producido:</strong> ${(total.o2 * anios).toFixed(1)} kg</li>`;
-  html += `<li><strong>Agua total interceptada:</strong> ${(total.agua * anios).toLocaleString()} L</li>`;
-  html += `</ul>`;
+  html += `</tbody></table>`;
+
+  html += `<h3>Total del proyecto a ${anios} año(s)</h3>
+    <ul>
+      <li><strong>CO₂ total capturado:</strong> ${(total.co2 * anios).toFixed(1)} kg</li>
+      <li><strong>O₂ total producido:</strong> ${(total.o2 * anios).toFixed(1)} kg</li>
+      <li><strong>Agua total interceptada:</strong> ${(total.agua * anios).toLocaleString()} L</li>
+    </ul>`;
 
   document.getElementById('resultado').innerHTML = html;
-  exportable.style.display = 'block'; // Muestra el recuadro cuando hay resultados
+  exportable.style.display = 'block';
 }
 
 function exportarImagen() {
